@@ -5,14 +5,14 @@ Version: 1.0.0
 Date: 2026-02-25
 Authors@R: c(
     person("Muhammad", "Alkhalaf", 
-           email = "contact@rufyqelngeh.com", 
+           email = "muhammedalkhalaf@gmail.com", 
            role = c("aut", "cre", "cph"),
            comment = c(ORCID = "0009-0002-2677-9246")),
     person("Merwan", "Roudane", 
            email = "merwanroudane920@gmail.com", 
            role = c("ctb"),
            comment = "Original Stata/Python implementation"))
-Maintainer: Muhammad Alkhalaf <contact@rufyqelngeh.com>
+Maintainer: Muhammad Alkhalaf <muhammedalkhalaf@gmail.com>
 Description: Comprehensive implementation of advanced ARDL methodologies for 
     cointegration analysis with structural breaks and asymmetric effects.
     Includes: (1) Fourier Quantile ARDL (FQARDL) - quantile regression with 
