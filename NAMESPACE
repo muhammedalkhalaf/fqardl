@@ -44,17 +44,20 @@ S3method(summary, mtnardl)
 S3method(print, fadf)
 S3method(print, fkpss)
 
-# Imports
-import(ggplot2)
-importFrom(quantreg, rq)
+# Imports from base packages
 importFrom(stats, lm, coef, vcov, residuals, fitted, pchisq, pf, AIC, BIC)
 importFrom(stats, complete.cases, na.omit, sd, var, cov, cor)
-importFrom(stats, pnorm, qnorm, dnorm, pt, qt, dt)
-importFrom(stats, rnorm, cumsum, diff)
+importFrom(stats, pnorm, qnorm, dnorm, pt, qt, dt, rnorm)
+importFrom(stats, density, embed, logLik, quantile, ts, time, frequency)
+importFrom(graphics, plot, lines, points, legend, par, layout)
 importFrom(utils, head, tail)
-importFrom(graphics, plot, lines, points, legend, par)
+
+# Imports from external packages
+import(ggplot2)
+importFrom(quantreg, rq)
 importFrom(zoo, zoo, index)
 importFrom(lmtest, coeftest)
 importFrom(sandwich, vcovHC)
-importFrom(dplyr, mutate, select, filter, arrange, group_by, summarise)
+importFrom(dplyr, mutate, select, filter, arrange, group_by, summarise, "%>%")
 importFrom(tidyr, pivot_longer, pivot_wider)
+importFrom(gridExtra, grid.arrange)

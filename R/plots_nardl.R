@@ -1,4 +1,4 @@
-#' =============================================================================
+﻿#' =============================================================================
 #' Visualization Functions for FNARDL
 #' Dynamic Multiplier Plots and Asymmetry Analysis
 #' =============================================================================
@@ -36,13 +36,7 @@ plot.fnardl <- function(x, type = c("asymmetry", "dynamic", "cumulative", "compa
 #' @param variable Variable to plot
 #'
 #' @keywords internal
-plot_asymmetry <- function(obj, variable = NULL) {
-  
-  require(ggplot2)
-  require(dplyr)
-  require(tidyr)
-  
-  if (is.null(variable)) {
+plot_asymmetry <- function(obj, variable = NULL) {if (is.null(variable)) {
     variable <- obj$decompose
   }
   
@@ -106,9 +100,6 @@ plot_asymmetry <- function(obj, variable = NULL) {
 #'
 #' @export
 plot_dynamic_multipliers <- function(obj, variable, horizon = 20) {
-  
-  require(ggplot2)
-  
   # Get coefficients
   phi <- obj$multipliers$ect
   
@@ -160,9 +151,6 @@ plot_dynamic_multipliers <- function(obj, variable, horizon = 20) {
 #'
 #' @export
 plot_cumulative_multipliers <- function(obj, variable, horizon = 20) {
-  
-  require(ggplot2)
-  
   phi <- obj$multipliers$ect
   
   lr_pos <- obj$multipliers$long_run_positive[variable]
@@ -217,9 +205,6 @@ plot_cumulative_multipliers <- function(obj, variable, horizon = 20) {
 #'
 #' @keywords internal
 plot_pos_neg_comparison <- function(obj) {
-  
-  require(ggplot2)
-  
   lr_pos <- obj$multipliers$long_run_positive
   lr_neg <- obj$multipliers$long_run_negative
   
@@ -244,7 +229,7 @@ plot_pos_neg_comparison <- function(obj) {
                        labels = c("TRUE" = "Asymmetric", "FALSE" = "Symmetric")) +
     labs(
       title = "Long-run Multiplier Comparison",
-      subtitle = "45° line indicates symmetry",
+      subtitle = "45? line indicates symmetry",
       x = "Positive Shock Multiplier",
       y = "Negative Shock Multiplier",
       color = "Asymmetry",
@@ -269,9 +254,6 @@ plot_pos_neg_comparison <- function(obj) {
 #'
 #' @export
 generate_fnardl_report <- function(obj, file = "fnardl_report.html", horizon = 20) {
-  
-  require(rmarkdown)
-  
   # Create temporary Rmd file
   rmd_content <- sprintf('
 ---
@@ -282,7 +264,6 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
-library(ggplot2)
 ```
 
 ## Model Summary

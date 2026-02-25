@@ -1,4 +1,4 @@
-#' =============================================================================
+﻿#' =============================================================================
 #' Fourier Quantile ARDL (FQARDL) - Main Functions
 #' Ported from Stata to R
 #' Original Stata implementation: Dr. Merwan Roudane

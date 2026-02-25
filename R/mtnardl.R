@@ -1,4 +1,4 @@
-#' =============================================================================
+﻿#' =============================================================================
 #' Multi-Threshold Nonlinear ARDL (MTNARDL)
 #' Extension of NARDL with multiple threshold decomposition
 #' Ported from Python: Dr. Merwan Roudane
@@ -578,7 +578,7 @@ summary.mtnardl <- function(object, ...) {
     tests <- object$regime_tests[[var]]
     for (test_name in names(tests)) {
       test <- tests[[test_name]]
-      cat(sprintf("  %s: Wald = %.3f, p = %.4f → %s\n",
+      cat(sprintf("  %s: Wald = %.3f, p = %.4f -> %s\n",
                   test_name, test$wald_stat, test$p_value, test$decision))
     }
     cat("\n")

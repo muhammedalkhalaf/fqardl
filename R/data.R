@@ -1,4 +1,4 @@
-#' Simulated Macroeconomic Data with Structural Break
+﻿#' Simulated Macroeconomic Data with Structural Break
 #'
 #' A simulated quarterly dataset containing GDP, inflation, and interest rate
 #' with a structural break at observation 100.

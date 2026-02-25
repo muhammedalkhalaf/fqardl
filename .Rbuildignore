@@ -12,3 +12,4 @@
 ^_pkgdown\.yml$
 ^\.lintr$
 ^examples$
+^data-raw$

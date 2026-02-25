@@ -1,4 +1,4 @@
-#' =============================================================================
+﻿#' =============================================================================
 #' Fourier Nonlinear ARDL (FNARDL) Implementation
 #' Combines NARDL (Shin et al., 2014) with Fourier approximation
 #' Ported from Stata: Dr. Merwan Roudane

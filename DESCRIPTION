@@ -28,7 +28,7 @@ Description: Comprehensive implementation of advanced ARDL methodologies for
     <doi:10.1002/jae.616>, bootstrap cointegration tests, Wald tests for 
     asymmetry, dynamic multiplier computation, and publication-ready 
     visualizations. Ported from Stata/Python by Dr. Merwan Roudane.
-License: GPL-3
+License: GPL-3 + file LICENSE
 URL: https://github.com/muhammedalkhalaf/fqardl
 BugReports: https://github.com/muhammedalkhalaf/fqardl/issues
 Encoding: UTF-8
@@ -42,6 +42,7 @@ Imports:
     ggplot2 (>= 3.0.0),
     dplyr,
     tidyr,
+    gridExtra,
     stats,
     utils,
     graphics
@@ -50,8 +51,6 @@ Suggests:
     knitr,
     rmarkdown,
     plotly,
-    gridExtra,
     covr
 RoxygenNote: 7.2.3
-VignetteBuilder: knitr
 Config/testthat/edition: 3

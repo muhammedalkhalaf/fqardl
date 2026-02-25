@@ -1,4 +1,4 @@
-#' =============================================================================
+﻿#' =============================================================================
 #' Visualization Functions for FQARDL
 #' Publication-ready plots
 #' =============================================================================
@@ -40,13 +40,7 @@ plot.fqardl <- function(x, type = c("coefficients", "multipliers", "3d",
 #' @return ggplot object
 #'
 #' @keywords internal
-plot_coefficients <- function(obj, variable = NULL) {
-  
-  require(ggplot2)
-  require(dplyr)
-  require(tidyr)
-  
-  tau <- obj$tau
+plot_coefficients <- function(obj, variable = NULL) {tau <- obj$tau
   
   # Extract coefficients
   coef_list <- lapply(seq_along(obj$qardl_results), function(i) {
@@ -103,13 +97,7 @@ plot_coefficients <- function(obj, variable = NULL) {
 #' @return ggplot object
 #'
 #' @keywords internal
-plot_multipliers <- function(obj) {
-  
-  require(ggplot2)
-  require(tidyr)
-  require(dplyr)
-  
-  tau <- obj$tau
+plot_multipliers <- function(obj) {tau <- obj$tau
   
   # Long-run multipliers
   lr_df <- as.data.frame(obj$long_run)
@@ -171,9 +159,6 @@ plot_3d_surface <- function(obj, variable = NULL) {
   if (!requireNamespace("plotly", quietly = TRUE)) {
     stop("Package 'plotly' is required for 3D plots")
   }
-  
-  require(plotly)
-  
   tau <- obj$tau
   
   # If variable not specified, use first independent variable
@@ -197,21 +182,21 @@ plot_3d_surface <- function(obj, variable = NULL) {
   # This is a simplified version - full implementation would use bootstrap
   z_matrix <- outer(coefs, seq(-2, 2, length.out = 20), function(c, m) c * m)
   
-  fig <- plot_ly(
+  fig <- plotly::plot_ly(
     x = tau,
     y = seq(-2, 2, length.out = 20),
     z = t(z_matrix)
-  ) %>%
-    add_surface(
+  )
+  fig <- plotly::add_surface(fig,
       colorscale = "Viridis",
       contours = list(
         z = list(show = TRUE, usecolormap = TRUE, highlightcolor = "#ff0000", project = list(z = TRUE))
       )
-    ) %>%
-    layout(
+    )
+  fig <- plotly::layout(fig,
       title = paste("3D Surface:", variable),
       scene = list(
-        xaxis = list(title = "Quantile (τ)"),
+        xaxis = list(title = "Quantile (tau)"),
         yaxis = list(title = "Effect Size"),
         zaxis = list(title = "Coefficient")
       )
@@ -228,12 +213,7 @@ plot_3d_surface <- function(obj, variable = NULL) {
 #' @return ggplot object
 #'
 #' @keywords internal
-plot_heatmap <- function(obj) {
-  
-  require(ggplot2)
-  require(tidyr)
-  
-  # Create coefficient matrix
+plot_heatmap <- function(obj) {# Create coefficient matrix
   coef_matrix <- t(sapply(obj$qardl_results, function(x) {
     x$coefficients[grep("_lag1$", names(x$coefficients))]
   }))
@@ -280,12 +260,7 @@ plot_heatmap <- function(obj) {
 #' @return ggplot object
 #'
 #' @keywords internal
-plot_residuals <- function(obj) {
-  
-  require(ggplot2)
-  require(gridExtra)
-  
-  # Use median quantile
+plot_residuals <- function(obj) {# Use median quantile
   median_idx <- which(obj$tau == 0.5)
   if (length(median_idx) == 0) median_idx <- 1
   
@@ -330,7 +305,7 @@ plot_residuals <- function(obj) {
     theme_minimal()
   
   # Combine
-  grid.arrange(p1, p2, p3, p4, ncol = 2)
+  gridExtra::grid.arrange(p1, p2, p3, p4, ncol = 2)
 }
 
 
@@ -347,9 +322,6 @@ plot_residuals <- function(obj) {
 #'
 #' @export
 plot_persistence <- function(obj, horizons = 20) {
-  
-  require(ggplot2)
-  
   tau <- obj$tau
   
   # Extract ECT coefficients (speed of adjustment)

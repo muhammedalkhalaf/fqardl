@@ -1,4 +1,4 @@
-#' =============================================================================
+﻿#' =============================================================================
 #' Fourier Unit Root Tests
 #' Based on Enders & Lee (2012) and Becker, Enders & Lee (2006)
 #' Ported from Python: Dr. Merwan Roudane
@@ -94,7 +94,7 @@ fourier_adf_test <- function(y, model = c("c", "ct"),
   cat("F-test for linearity (H0: no Fourier terms needed):\n")
   cat(sprintf("   F-statistic: %.4f\n", f_test$f_stat))
   cat(sprintf("   P-value: %.4f\n", f_test$p_value))
-  cat(sprintf("   → %s\n", 
+  cat(sprintf("   -> %s\n", 
               if (f_test$reject) "Reject linearity: Fourier terms ARE significant" 
               else "Cannot reject linearity: Consider standard ADF"))
   
@@ -458,7 +458,7 @@ fourier_kpss_test <- function(y, model = c("c", "ct"), max_freq = 3) {
   cat("-----------------------------------------------------------------\n")
   cat(sprintf("Conclusion: %s null hypothesis of stationarity\n",
               if (reject) "Reject" else "Cannot reject"))
-  cat(sprintf("            → Series is %s\n",
+  cat(sprintf("            -> Series is %s\n",
               if (reject) "NON-STATIONARY" else "STATIONARY"))
   cat("=================================================================\n")
   
@@ -635,9 +635,9 @@ fourier_unit_root_analysis <- function(y, name = "Series", max_freq = 3) {
   cat(sprintf("\n%s\n\n", conclusion))
   
   if (adf_result$f_test$reject || kpss_result$optimal_frequency > 1) {
-    cat("Note: Fourier terms ARE significant → Structural breaks present\n")
+    cat("Note: Fourier terms ARE significant -> Structural breaks present\n")
   } else {
-    cat("Note: Fourier terms not significant → Standard tests may suffice\n")
+    cat("Note: Fourier terms not significant -> Standard tests may suffice\n")
   }
   
   cat("===============================================================\n")
