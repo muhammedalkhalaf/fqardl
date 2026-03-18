@@ -1,4 +1,4 @@
-﻿#' =============================================================================
+#' =============================================================================
 #' Visualization Functions for FNARDL
 #' Dynamic Multiplier Plots and Asymmetry Analysis
 #' =============================================================================
@@ -251,9 +251,11 @@ plot_pos_neg_comparison <- function(obj) {
 #' @param obj FNARDL object
 #' @param file Output file path (HTML or PDF)
 #' @param horizon Horizon for dynamic multipliers
+#' @param verbose Logical. Print completion message (default: TRUE)
 #'
 #' @export
-generate_fnardl_report <- function(obj, file = "fnardl_report.html", horizon = 20) {
+generate_fnardl_report <- function(obj, file = "fnardl_report.html", horizon = 20,
+                                   verbose = TRUE) {
   # Create temporary Rmd file
   rmd_content <- sprintf('
 ---
@@ -300,5 +302,5 @@ for (var in obj$decompose) {
   
   rmarkdown::render(tmp_rmd, output_file = file, envir = new.env())
   
-  cat(sprintf("Report saved to: %s\n", file))
+  if (verbose) message(sprintf("Report saved to: %s", file))
 }

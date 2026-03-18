@@ -1,4 +1,4 @@
-﻿#' =============================================================================
+#' =============================================================================
 #' Fourier Nonlinear ARDL (FNARDL) Implementation
 #' Combines NARDL (Shin et al., 2014) with Fourier approximation
 #' Ported from Stata: Dr. Merwan Roudane
@@ -22,16 +22,18 @@
 #' @param case Model case (1-5)
 #' @param bootstrap Perform bootstrap test
 #' @param n_boot Number of bootstrap replications
+#' @param verbose Logical. Print progress messages (default: TRUE)
 #'
 #' @return An object of class "fnardl"
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' result <- fnardl(
 #'   formula = gdp ~ oil_price + exchange_rate,
 #'   data = macro_data,
 #'   decompose = c("oil_price"),  # Decompose oil price into + and -
-#'   max_k = 3
+#'   max_k = 3,
+#'   verbose = FALSE
 #' )
 #' summary(result)
 #' plot(result, type = "asymmetry")
@@ -46,7 +48,8 @@ fnardl <- function(formula, data,
                    criterion = c("BIC", "AIC", "HQ"),
                    case = 3,
                    bootstrap = FALSE,
-                   n_boot = 1000) {
+                   n_boot = 1000,
+                   verbose = TRUE) {
   
   criterion <- match.arg(criterion)
   
@@ -69,39 +72,41 @@ if (is.null(decompose)) {
   y <- data[[y_name]]
   n <- length(y)
   
-  cat("=================================================================\n")
-  cat("   Fourier Nonlinear ARDL (FNARDL) Estimation\n")
-  cat("   Asymmetric Effects with Smooth Structural Breaks\n")
-  cat("=================================================================\n\n")
+  if (verbose) {
+    message("=================================================================")
+    message("   Fourier Nonlinear ARDL (FNARDL) Estimation")
+    message("   Asymmetric Effects with Smooth Structural Breaks")
+    message("=================================================================\n")
+  }
   
   # Step 1: Decompose variables into positive and negative changes
-  cat("Step 1: Decomposing variables into positive/negative changes...\n")
+  if (verbose) message("Step 1: Decomposing variables into positive/negative changes...")
   decomposed_data <- decompose_variables(data, decompose)
-  cat(sprintf("   Decomposed: %s\n\n", paste(decompose, collapse = ", ")))
+  if (verbose) message(sprintf("   Decomposed: %s\n", paste(decompose, collapse = ", ")))
   
   # Step 2: Build full regressor matrix
   X_full <- build_nardl_regressors(data, x_names, decompose, decomposed_data)
   x_names_full <- colnames(X_full)
-  cat(sprintf("   Total regressors: %d\n\n", ncol(X_full)))
+  if (verbose) message(sprintf("   Total regressors: %d\n", ncol(X_full)))
   
   # Step 3: Select optimal Fourier frequency
-  cat("Step 2: Selecting optimal Fourier frequency...\n")
+  if (verbose) message("Step 2: Selecting optimal Fourier frequency...")
   k_results <- select_fourier_frequency(y, X_full, max_k, criterion)
   optimal_k <- k_results$optimal_k
-  cat(sprintf("   Optimal k = %d\n\n", optimal_k))
+  if (verbose) message(sprintf("   Optimal k = %d\n", optimal_k))
   
   # Step 4: Generate Fourier terms
   fourier_terms <- generate_fourier_terms(n, optimal_k)
   
   # Step 5: Select optimal lags
-  cat("Step 3: Selecting optimal lag structure...\n")
+  if (verbose) message("Step 3: Selecting optimal lag structure...")
   lag_results <- select_optimal_lags(y, X_full, fourier_terms, max_p, max_q, criterion)
   optimal_p <- lag_results$optimal_p
   optimal_q <- lag_results$optimal_q
-  cat(sprintf("   Optimal lags: p = %d, q = %d\n\n", optimal_p, optimal_q))
+  if (verbose) message(sprintf("   Optimal lags: p = %d, q = %d\n", optimal_p, optimal_q))
   
   # Step 6: Estimate NARDL model
-  cat("Step 4: Estimating Fourier NARDL model...\n")
+  if (verbose) message("Step 4: Estimating Fourier NARDL model...")
   nardl_result <- estimate_nardl(
     y = y,
     X = X_full,
@@ -110,48 +115,54 @@ if (is.null(decompose)) {
     q = optimal_q,
     case = case
   )
-  cat("   Model estimated.\n\n")
+  if (verbose) message("   Model estimated.\n")
   
   # Step 7: Calculate asymmetric multipliers
-  cat("Step 5: Computing asymmetric multipliers...\n")
+  if (verbose) message("Step 5: Computing asymmetric multipliers...")
   multipliers <- compute_asymmetric_multipliers(
     nardl_result, 
     decompose, 
     x_names
   )
-  cat("   Long-run and short-run multipliers computed.\n\n")
+  if (verbose) message("   Long-run and short-run multipliers computed.\n")
   
   # Step 8: Wald tests for asymmetry
-  cat("Step 6: Testing for asymmetry...\n")
+  if (verbose) message("Step 6: Testing for asymmetry...")
   asymmetry_tests <- test_asymmetry(nardl_result, decompose)
-  for (var in decompose) {
-    cat(sprintf("   %s: Wald = %.3f (p = %.4f) - %s\n", 
-                var,
-                asymmetry_tests[[var]]$wald_stat,
-                asymmetry_tests[[var]]$p_value,
-                asymmetry_tests[[var]]$decision))
+  if (verbose) {
+    for (var in decompose) {
+      message(sprintf("   %s: Wald = %.3f (p = %.4f) - %s", 
+                  var,
+                  asymmetry_tests[[var]]$wald_stat,
+                  asymmetry_tests[[var]]$p_value,
+                  asymmetry_tests[[var]]$decision))
+    }
+    message("")
   }
-  cat("\n")
   
   # Step 9: Bounds test
-  cat("Step 7: Bounds test for cointegration...\n")
+  if (verbose) message("Step 7: Bounds test for cointegration...")
   bounds_result <- perform_nardl_bounds_test(nardl_result, n, length(x_names_full), case)
-  cat(sprintf("   F-statistic: %.4f\n", bounds_result$F_stat))
-  cat(sprintf("   Decision: %s\n\n", bounds_result$decision))
+  if (verbose) {
+    message(sprintf("   F-statistic: %.4f", bounds_result$F_stat))
+    message(sprintf("   Decision: %s\n", bounds_result$decision))
+  }
   
   # Step 10: Bootstrap (if requested)
   bootstrap_results <- NULL
   if (bootstrap) {
-    cat("Step 8: Bootstrap cointegration test...\n")
+    if (verbose) message("Step 8: Bootstrap cointegration test...")
     bootstrap_results <- bootstrap_nardl(
       y, X_full, fourier_terms, optimal_p, optimal_q, case, n_boot
     )
-    cat(sprintf("   Bootstrap p-value: %.4f\n\n", bootstrap_results$p_value))
+    if (verbose) message(sprintf("   Bootstrap p-value: %.4f\n", bootstrap_results$p_value))
   }
   
-  cat("=================================================================\n")
-  cat("   Estimation complete!\n")
-  cat("=================================================================\n")
+  if (verbose) {
+    message("=================================================================")
+    message("   Estimation complete!")
+    message("=================================================================")
+  }
   
   # Compile results
   result <- list(
@@ -535,7 +546,7 @@ bootstrap_nardl <- function(y, X, fourier, p, q, case, n_boot) {
       boot_t[b] <- NA
     })
     
-    if (b %% 200 == 0) cat(sprintf("   Bootstrap %d/%d\n", b, n_boot))
+    # Progress is suppressed for CRAN compliance
   }
   
   boot_t <- boot_t[!is.na(boot_t)]

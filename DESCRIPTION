@@ -1,8 +1,11 @@
 Package: fqardl
 Type: Package
 Title: Fourier ARDL Methods: Quantile, Nonlinear, Multi-Threshold & Unit Root Tests
-Version: 1.0.0
+Version: 1.0.2
 Date: 2026-02-25
+Author: Muhammad Alkhalaf [aut, cre, cph] (<https://orcid.org/0009-0002-2677-9246>),
+    Merwan Roudane [ctb] (Original Stata/Python implementation)
+Maintainer: Muhammad Alkhalaf <muhammedalkhalaf@gmail.com>
 Authors@R: c(
     person("Muhammad", "Alkhalaf", 
            email = "muhammedalkhalaf@gmail.com", 
@@ -12,7 +15,6 @@ Authors@R: c(
            email = "merwanroudane920@gmail.com", 
            role = c("ctb"),
            comment = "Original Stata/Python implementation"))
-Maintainer: Muhammad Alkhalaf <muhammedalkhalaf@gmail.com>
 Description: Comprehensive implementation of advanced ARDL methodologies for 
     cointegration analysis with structural breaks and asymmetric effects.
     Includes: (1) Fourier Quantile ARDL (FQARDL) - quantile regression with 
@@ -28,7 +30,7 @@ Description: Comprehensive implementation of advanced ARDL methodologies for
     <doi:10.1002/jae.616>, bootstrap cointegration tests, Wald tests for 
     asymmetry, dynamic multiplier computation, and publication-ready 
     visualizations. Ported from Stata/Python by Dr. Merwan Roudane.
-License: GPL-3 + file LICENSE
+License: GPL-3
 URL: https://github.com/muhammedalkhalaf/fqardl
 BugReports: https://github.com/muhammedalkhalaf/fqardl/issues
 Encoding: UTF-8
@@ -36,21 +38,15 @@ LazyData: true
 Depends: R (>= 3.5.0)
 Imports:
     quantreg (>= 5.0),
-    zoo,
-    lmtest,
-    sandwich,
     ggplot2 (>= 3.0.0),
-    dplyr,
     tidyr,
     gridExtra,
-    stats,
-    utils,
-    graphics
+    stats
 Suggests:
     testthat (>= 3.0.0),
     knitr,
     rmarkdown,
     plotly,
     covr
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.3
 Config/testthat/edition: 3

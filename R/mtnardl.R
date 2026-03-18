@@ -1,4 +1,4 @@
-﻿#' =============================================================================
+#' =============================================================================
 #' Multi-Threshold Nonlinear ARDL (MTNARDL)
 #' Extension of NARDL with multiple threshold decomposition
 #' Ported from Python: Dr. Merwan Roudane
@@ -24,7 +24,7 @@
 #' @return Object of class "mtnardl"
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' result <- mtnardl(
 #'   formula = gdp ~ oil_price,
 #'   data = macro_data,
@@ -35,6 +35,7 @@
 #' summary(result)
 #' }
 #'
+#' @param verbose Logical. Print progress messages (default: TRUE)
 #' @export
 mtnardl <- function(formula, data,
                     decompose = NULL,
@@ -42,7 +43,8 @@ mtnardl <- function(formula, data,
                     max_p = 4,
                     max_q = 4,
                     criterion = c("BIC", "AIC", "HQ"),
-                    case = 3) {
+                    case = 3,
+                    verbose = TRUE) {
   
   criterion <- match.arg(criterion)
   
@@ -65,13 +67,15 @@ mtnardl <- function(formula, data,
   y <- data[[y_name]]
   n <- length(y)
   
-  cat("=================================================================\n")
-  cat("   Multi-Threshold NARDL (MTNARDL) Estimation\n")
-  cat("   Multiple Regime Asymmetric Analysis\n")
-  cat("=================================================================\n\n")
+  if (verbose) {
+    message("=================================================================")
+    message("   Multi-Threshold NARDL (MTNARDL) Estimation")
+    message("   Multiple Regime Asymmetric Analysis")
+    message("=================================================================\n")
+  }
   
   # Step 1: Decompose with multiple thresholds
-  cat("Step 1: Multi-threshold decomposition...\n")
+  if (verbose) message("Step 1: Multi-threshold decomposition...")
   decomposed <- list()
   regime_names <- list()
   
@@ -80,57 +84,60 @@ mtnardl <- function(formula, data,
     result <- decompose_multi_threshold(data[[var]], thresh)
     decomposed[[var]] <- result$components
     regime_names[[var]] <- result$names
-    cat(sprintf("   %s: %d regimes (thresholds: %s)\n", 
+    if (verbose) message(sprintf("   %s: %d regimes (thresholds: %s)", 
                 var, length(result$names), 
                 paste(thresh, collapse = ", ")))
   }
-  cat("\n")
+  if (verbose) message("")
   
   # Step 2: Build regressor matrix
-  cat("Step 2: Building regressor matrix...\n")
+  if (verbose) message("Step 2: Building regressor matrix...")
   X_full <- build_mtnardl_regressors(data, x_names, decompose, decomposed, regime_names)
-  cat(sprintf("   Total regressors: %d\n\n", ncol(X_full)))
+  if (verbose) message(sprintf("   Total regressors: %d\n", ncol(X_full)))
   
   # Step 3: Select optimal lags
-  cat("Step 3: Selecting optimal lags...\n")
+  if (verbose) message("Step 3: Selecting optimal lags...")
   lag_result <- select_mtnardl_lags(y, X_full, max_p, max_q, criterion)
   optimal_p <- lag_result$optimal_p
   optimal_q <- lag_result$optimal_q
-  cat(sprintf("   Optimal: p = %d, q = %d\n\n", optimal_p, optimal_q))
+  if (verbose) message(sprintf("   Optimal: p = %d, q = %d\n", optimal_p, optimal_q))
   
   # Step 4: Estimate model
-  cat("Step 4: Estimating MTNARDL model...\n")
+  if (verbose) message("Step 4: Estimating MTNARDL model...")
   model_result <- estimate_mtnardl(y, X_full, optimal_p, optimal_q, case)
-  cat("   Model estimated.\n\n")
+  if (verbose) message("   Model estimated.\n")
   
   # Step 5: Compute regime-specific multipliers
-  cat("Step 5: Computing regime-specific multipliers...\n")
+  if (verbose) message("Step 5: Computing regime-specific multipliers...")
   multipliers <- compute_regime_multipliers(model_result, decompose, regime_names)
-  cat("   Multipliers computed.\n\n")
+  if (verbose) message("   Multipliers computed.\n")
   
   # Step 6: Test for regime asymmetry
-  cat("Step 6: Testing for regime asymmetry...\n")
+  if (verbose) message("Step 6: Testing for regime asymmetry...")
   regime_tests <- test_regime_asymmetry(model_result, decompose, regime_names)
   
-  for (var in decompose) {
-    cat(sprintf("   %s:\n", var))
-    for (test_name in names(regime_tests[[var]])) {
-      test <- regime_tests[[var]][[test_name]]
-      cat(sprintf("      %s: Wald = %.3f (p = %.4f)\n",
-                  test_name, test$wald_stat, test$p_value))
+  if (verbose) {
+    for (var in decompose) {
+      message(sprintf("   %s:", var))
+      for (test_name in names(regime_tests[[var]])) {
+        test <- regime_tests[[var]][[test_name]]
+        message(sprintf("      %s: Wald = %.3f (p = %.4f)",
+                    test_name, test$wald_stat, test$p_value))
+      }
     }
+    message("")
   }
-  cat("\n")
   
   # Step 7: Bounds test
-  cat("Step 7: Bounds test for cointegration...\n")
+  if (verbose) message("Step 7: Bounds test for cointegration...")
   bounds <- perform_mtnardl_bounds(model_result, n, ncol(X_full), case)
-  cat(sprintf("   F-statistic: %.4f\n", bounds$F_stat))
-  cat(sprintf("   Decision: %s\n\n", bounds$decision))
-  
-  cat("=================================================================\n")
-  cat("   Estimation complete!\n")
-  cat("=================================================================\n")
+  if (verbose) {
+    message(sprintf("   F-statistic: %.4f", bounds$F_stat))
+    message(sprintf("   Decision: %s\n", bounds$decision))
+    message("=================================================================")
+    message("   Estimation complete!")
+    message("=================================================================")
+  }
   
   result <- list(
     call = match.call(),

@@ -6,7 +6,7 @@ Estimates Multi-Threshold NARDL models with multiple regime asymmetry.
 }
 \usage{
 mtnardl(formula, data, decompose = NULL, thresholds = NULL,
-        max_p = 4, max_q = 4, criterion = c("BIC", "AIC", "HQ"), case = 3)
+        max_p = 4, max_q = 4, criterion = c("BIC", "AIC", "HQ"), case = 3, verbose = TRUE)
 }
 \arguments{
   \item{formula}{A formula specifying the model.}
@@ -17,6 +17,7 @@ mtnardl(formula, data, decompose = NULL, thresholds = NULL,
   \item{max_q}{Maximum lag for independent variables.}
   \item{criterion}{Information criterion for selection.}
   \item{case}{PSS bounds test case.}
+  \item{verbose}{Logical. Print progress messages (default: TRUE).}
 }
 \value{
 An object of class "mtnardl".

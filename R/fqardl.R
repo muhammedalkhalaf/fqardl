@@ -1,4 +1,4 @@
-﻿#' =============================================================================
+#' =============================================================================
 #' Fourier Quantile ARDL (FQARDL) - Main Functions
 #' Ported from Stata to R
 #' Original Stata implementation: Dr. Merwan Roudane
@@ -34,7 +34,7 @@
 #' \item{diagnostics}{Model diagnostics}
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' data(macro_data)
 #' result <- fqardl(gdp ~ inflation + interest_rate, 
 #'                  data = macro_data,
@@ -54,7 +54,8 @@ fqardl <- function(formula, data,
                    case = 3,
                    bootstrap = FALSE,
                    n_boot = 1000,
-                   seed = NULL) {
+                   seed = NULL,
+                   verbose = TRUE) {
   
   # Validate inputs
   criterion <- match.arg(criterion)
@@ -98,41 +99,42 @@ fqardl <- function(formula, data,
     n <- length(y)
   }
   
-  cat("=================================================================\n")
-  cat("   Fourier Quantile ARDL (FQARDL) Estimation\n")
-  cat("   Ported from Stata | Original: Dr. Merwan Roudane\n")
-  cat("=================================================================\n\n")
-  cat(sprintf("Dependent variable: %s\n", y_name))
-  cat(sprintf("Independent variables: %s\n", paste(x_names, collapse = ", ")))
-  cat(sprintf("Sample size: %d\n", n))
-  cat(sprintf("Quantiles: %s\n", paste(tau, collapse = ", ")))
-  cat("\n")
+  if (verbose) {
+    message("=================================================================")
+    message("   Fourier Quantile ARDL (FQARDL) Estimation")
+    message("   Ported from Stata | Original: Dr. Merwan Roudane")
+    message("=================================================================\n")
+    message(sprintf("Dependent variable: %s", y_name))
+    message(sprintf("Independent variables: %s", paste(x_names, collapse = ", ")))
+    message(sprintf("Sample size: %d", n))
+    message(sprintf("Quantiles: %s\n", paste(tau, collapse = ", ")))
+  }
   
   # Step 1: Select optimal Fourier frequency
-  cat("Step 1: Selecting optimal Fourier frequency...\n")
+  if (verbose) message("Step 1: Selecting optimal Fourier frequency...")
   k_results <- select_fourier_frequency(y, X, max_k, criterion)
   optimal_k <- k_results$optimal_k
-  cat(sprintf("   Optimal k = %d (based on %s)\n\n", optimal_k, criterion))
+  if (verbose) message(sprintf("   Optimal k = %d (based on %s)\n", optimal_k, criterion))
   
   # Step 2: Generate Fourier terms
-  cat("Step 2: Generating Fourier terms...\n")
+  if (verbose) message("Step 2: Generating Fourier terms...")
   fourier_terms <- generate_fourier_terms(n, optimal_k)
-  cat(sprintf("   Generated sin and cos terms for k = %d\n\n", optimal_k))
+  if (verbose) message(sprintf("   Generated sin and cos terms for k = %d\n", optimal_k))
   
   # Step 3: Select optimal lag structure
-  cat("Step 3: Selecting optimal lag structure...\n")
+  if (verbose) message("Step 3: Selecting optimal lag structure...")
   lag_results <- select_optimal_lags(y, X, fourier_terms, max_p, max_q, criterion)
   optimal_p <- lag_results$optimal_p
   optimal_q <- lag_results$optimal_q
-  cat(sprintf("   Optimal lags: p = %d, q = %d (based on %s)\n\n", 
+  if (verbose) message(sprintf("   Optimal lags: p = %d, q = %d (based on %s)\n", 
               optimal_p, optimal_q, criterion))
   
   # Step 4: Estimate QARDL for each quantile
-  cat("Step 4: Estimating Quantile ARDL for each tau...\n")
+  if (verbose) message("Step 4: Estimating Quantile ARDL for each tau...")
   qardl_results <- list()
   
   for (i in seq_along(tau)) {
-    cat(sprintf("   Estimating tau = %.2f...\n", tau[i]))
+    if (verbose) message(sprintf("   Estimating tau = %.2f...", tau[i]))
     qardl_results[[i]] <- estimate_qardl(
       y = y,
       X = X,
@@ -144,40 +146,45 @@ fqardl <- function(formula, data,
     )
   }
   names(qardl_results) <- paste0("tau_", tau)
-  cat("\n")
   
   # Step 5: Calculate long-run and short-run multipliers
-  cat("Step 5: Computing multipliers...\n")
+  if (verbose) message("Step 5: Computing multipliers...")
   multipliers <- compute_multipliers(qardl_results, x_names, tau)
-  cat("   Long-run and short-run multipliers computed.\n\n")
+  if (verbose) message("   Long-run and short-run multipliers computed.\n")
   
   # Step 6: Bounds test for cointegration
-  cat("Step 6: Performing bounds test for cointegration...\n")
+  if (verbose) message("Step 6: Performing bounds test for cointegration...")
   bounds_results <- perform_bounds_test(qardl_results, n, length(x_names), case)
-  cat(sprintf("   F-statistic: %.4f\n", bounds_results$F_stat))
-  cat(sprintf("   t-statistic: %.4f\n", bounds_results$t_stat))
-  cat(sprintf("   Decision: %s\n\n", bounds_results$decision))
+  if (verbose) {
+    message(sprintf("   F-statistic: %.4f", bounds_results$F_stat))
+    message(sprintf("   t-statistic: %.4f", bounds_results$t_stat))
+    message(sprintf("   Decision: %s\n", bounds_results$decision))
+  }
   
   # Step 7: Bootstrap cointegration test (if requested)
   bootstrap_results <- NULL
   if (bootstrap) {
-    cat("Step 7: Bootstrap cointegration testing...\n")
+    if (verbose) message("Step 7: Bootstrap cointegration testing...")
     bootstrap_results <- bootstrap_bounds_test(
       y, X, fourier_terms, optimal_p, optimal_q, 
-      tau, case, n_boot
+      tau, case, n_boot, verbose = verbose
     )
-    cat(sprintf("   Bootstrap p-value (F): %.4f\n", bootstrap_results$p_value_F))
-    cat(sprintf("   Bootstrap p-value (t): %.4f\n\n", bootstrap_results$p_value_t))
+    if (verbose) {
+      message(sprintf("   Bootstrap p-value (F): %.4f", bootstrap_results$p_value_F))
+      message(sprintf("   Bootstrap p-value (t): %.4f\n", bootstrap_results$p_value_t))
+    }
   }
   
   # Step 8: Diagnostics
-  cat("Step 8: Computing diagnostics...\n")
+  if (verbose) message("Step 8: Computing diagnostics...")
   diagnostics <- compute_diagnostics(qardl_results)
-  cat("   Diagnostics computed.\n\n")
+  if (verbose) message("   Diagnostics computed.\n")
   
-  cat("=================================================================\n")
-  cat("   Estimation complete!\n")
-  cat("=================================================================\n")
+  if (verbose) {
+    message("=================================================================")
+    message("   Estimation complete!")
+    message("=================================================================")
+  }
   
   # Compile results
   result <- list(

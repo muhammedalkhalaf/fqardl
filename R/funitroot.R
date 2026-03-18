@@ -1,4 +1,4 @@
-﻿#' =============================================================================
+#' =============================================================================
 #' Fourier Unit Root Tests
 #' Based on Enders & Lee (2012) and Becker, Enders & Lee (2006)
 #' Ported from Python: Dr. Merwan Roudane
@@ -20,7 +20,7 @@
 #' @return Object of class "fadf" with test results
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' set.seed(123)
 #' y <- cumsum(rnorm(200))  # Random walk
 #' result <- fourier_adf_test(y, model = "c", max_freq = 3)
@@ -35,7 +35,8 @@
 fourier_adf_test <- function(y, model = c("c", "ct"), 
                               max_freq = 3, 
                               max_lag = NULL,
-                              criterion = c("AIC", "BIC", "t-sig")) {
+                              criterion = c("AIC", "BIC", "t-sig"),
+                              verbose = TRUE) {
   
   model <- match.arg(model)
   criterion <- match.arg(criterion)
@@ -47,10 +48,12 @@ fourier_adf_test <- function(y, model = c("c", "ct"),
     max_lag <- floor(12 * (n / 100)^0.25)
   }
   
-  cat("=================================================================\n")
-  cat("   Fourier ADF Unit Root Test\n")
-  cat("   Enders & Lee (2012) Economics Letters\n")
-  cat("=================================================================\n\n")
+  if (verbose) {
+    message("=================================================================")
+    message("   Fourier ADF Unit Root Test")
+    message("   Enders & Lee (2012) Economics Letters")
+    message("=================================================================\n")
+  }
   
   # Test for each frequency and find optimal k
   results_by_k <- list()
@@ -65,46 +68,53 @@ fourier_adf_test <- function(y, model = c("c", "ct"),
   optimal_k <- which.min(ssr_values)
   best_result <- results_by_k[[optimal_k]]
   
-  cat(sprintf("Model: %s\n", if (model == "c") "Constant" else "Constant + Trend"))
-  cat(sprintf("Sample size: %d\n", n))
-  cat(sprintf("Maximum lag tested: %d\n", max_lag))
-  cat(sprintf("Maximum frequency: %d\n", max_freq))
-  cat(sprintf("Lag selection: %s\n\n", criterion))
-  
-  cat("-----------------------------------------------------------------\n")
-  cat(sprintf("Optimal frequency (k): %d\n", optimal_k))
-  cat(sprintf("Optimal lag (p): %d\n", best_result$optimal_lag))
-  cat(sprintf("ADF statistic: %.4f\n", best_result$adf_stat))
-  cat(sprintf("P-value: %.4f\n", best_result$p_value))
-  cat("-----------------------------------------------------------------\n")
+  if (verbose) {
+    message(sprintf("Model: %s", if (model == "c") "Constant" else "Constant + Trend"))
+    message(sprintf("Sample size: %d", n))
+    message(sprintf("Maximum lag tested: %d", max_lag))
+    message(sprintf("Maximum frequency: %d", max_freq))
+    message(sprintf("Lag selection: %s\n", criterion))
+    message("-----------------------------------------------------------------")
+    message(sprintf("Optimal frequency (k): %d", optimal_k))
+    message(sprintf("Optimal lag (p): %d", best_result$optimal_lag))
+    message(sprintf("ADF statistic: %.4f", best_result$adf_stat))
+    message(sprintf("P-value: %.4f", best_result$p_value))
+    message("-----------------------------------------------------------------")
+  }
   
   # Critical values
   cv <- get_fadf_critical_values(n, model, optimal_k)
-  cat("\nCritical values:\n")
-  cat(sprintf("   1%%  : %.4f %s\n", cv[1], 
-              if (best_result$adf_stat < cv[1]) "*" else ""))
-  cat(sprintf("   5%%  : %.4f %s\n", cv[2], 
-              if (best_result$adf_stat < cv[2]) "*" else ""))
-  cat(sprintf("   10%% : %.4f %s\n", cv[3], 
-              if (best_result$adf_stat < cv[3]) "*" else ""))
+  if (verbose) {
+    message("\nCritical values:")
+    message(sprintf("   1%%  : %.4f %s", cv[1], 
+                if (best_result$adf_stat < cv[1]) "*" else ""))
+    message(sprintf("   5%%  : %.4f %s", cv[2], 
+                if (best_result$adf_stat < cv[2]) "*" else ""))
+    message(sprintf("   10%% : %.4f %s", cv[3], 
+                if (best_result$adf_stat < cv[3]) "*" else ""))
+  }
   
   # F-test for linearity
   f_test <- fadf_f_test(y, model, optimal_k, best_result$optimal_lag)
-  cat("-----------------------------------------------------------------\n")
-  cat("F-test for linearity (H0: no Fourier terms needed):\n")
-  cat(sprintf("   F-statistic: %.4f\n", f_test$f_stat))
-  cat(sprintf("   P-value: %.4f\n", f_test$p_value))
-  cat(sprintf("   -> %s\n", 
-              if (f_test$reject) "Reject linearity: Fourier terms ARE significant" 
-              else "Cannot reject linearity: Consider standard ADF"))
+  if (verbose) {
+    message("-----------------------------------------------------------------")
+    message("F-test for linearity (H0: no Fourier terms needed):")
+    message(sprintf("   F-statistic: %.4f", f_test$f_stat))
+    message(sprintf("   P-value: %.4f", f_test$p_value))
+    message(sprintf("   -> %s", 
+                if (f_test$reject) "Reject linearity: Fourier terms ARE significant" 
+                else "Cannot reject linearity: Consider standard ADF"))
+  }
   
   # Conclusion
-  cat("-----------------------------------------------------------------\n")
   reject <- best_result$adf_stat < cv[2]  # 5% level
-  cat(sprintf("Conclusion: %s null hypothesis of unit root\n",
-              if (reject) "Reject" else "Cannot reject"))
-  cat(sprintf("            at 5%% significance level\n"))
-  cat("=================================================================\n")
+  if (verbose) {
+    message("-----------------------------------------------------------------")
+    message(sprintf("Conclusion: %s null hypothesis of unit root",
+                if (reject) "Reject" else "Cannot reject"))
+    message("            at 5% significance level")
+    message("=================================================================")
+  }
   
   result <- list(
     statistic = best_result$adf_stat,
@@ -409,17 +419,20 @@ print.fadf <- function(x, ...) {
 #' Becker, R., Enders, W., & Lee, J. (2006). A stationarity test in the presence
 #' of an unknown number of smooth breaks. Journal of Time Series Analysis, 27(3), 381-409.
 #'
+#' @param verbose Logical. Print progress messages (default: TRUE)
 #' @export
-fourier_kpss_test <- function(y, model = c("c", "ct"), max_freq = 3) {
+fourier_kpss_test <- function(y, model = c("c", "ct"), max_freq = 3, verbose = TRUE) {
   
   model <- match.arg(model)
   n <- length(y)
   t_index <- 1:n
   
-  cat("=================================================================\n")
-  cat("   Fourier KPSS Stationarity Test\n")
-  cat("   Becker, Enders & Lee (2006)\n")
-  cat("=================================================================\n\n")
+  if (verbose) {
+    message("=================================================================")
+    message("   Fourier KPSS Stationarity Test")
+    message("   Becker, Enders & Lee (2006)")
+    message("=================================================================\n")
+  }
   
   # Test for each frequency
   results_by_k <- list()
@@ -434,33 +447,38 @@ fourier_kpss_test <- function(y, model = c("c", "ct"), max_freq = 3) {
   optimal_k <- which.min(ssr_values)
   best_result <- results_by_k[[optimal_k]]
   
-  cat(sprintf("Model: %s\n", if (model == "c") "Level" else "Trend"))
-  cat(sprintf("Sample size: %d\n", n))
-  cat(sprintf("Optimal frequency: k = %d\n\n", optimal_k))
-  
-  cat("-----------------------------------------------------------------\n")
-  cat(sprintf("KPSS statistic: %.6f\n", best_result$kpss_stat))
-  cat(sprintf("P-value: %.4f\n", best_result$p_value))
-  cat("-----------------------------------------------------------------\n")
+  if (verbose) {
+    message(sprintf("Model: %s", if (model == "c") "Level" else "Trend"))
+    message(sprintf("Sample size: %d", n))
+    message(sprintf("Optimal frequency: k = %d\n", optimal_k))
+    message("-----------------------------------------------------------------")
+    message(sprintf("KPSS statistic: %.6f", best_result$kpss_stat))
+    message(sprintf("P-value: %.4f", best_result$p_value))
+    message("-----------------------------------------------------------------")
+  }
   
   # Critical values
   cv <- get_fkpss_critical_values(model, optimal_k)
-  cat("\nCritical values:\n")
-  cat(sprintf("   1%%  : %.4f %s\n", cv[1], 
-              if (best_result$kpss_stat > cv[1]) "*" else ""))
-  cat(sprintf("   5%%  : %.4f %s\n", cv[2], 
-              if (best_result$kpss_stat > cv[2]) "*" else ""))
-  cat(sprintf("   10%% : %.4f %s\n", cv[3], 
-              if (best_result$kpss_stat > cv[3]) "*" else ""))
+  if (verbose) {
+    message("\nCritical values:")
+    message(sprintf("   1%%  : %.4f %s", cv[1], 
+                if (best_result$kpss_stat > cv[1]) "*" else ""))
+    message(sprintf("   5%%  : %.4f %s", cv[2], 
+                if (best_result$kpss_stat > cv[2]) "*" else ""))
+    message(sprintf("   10%% : %.4f %s", cv[3], 
+                if (best_result$kpss_stat > cv[3]) "*" else ""))
+  }
   
   # Conclusion
   reject <- best_result$kpss_stat > cv[2]
-  cat("-----------------------------------------------------------------\n")
-  cat(sprintf("Conclusion: %s null hypothesis of stationarity\n",
-              if (reject) "Reject" else "Cannot reject"))
-  cat(sprintf("            -> Series is %s\n",
-              if (reject) "NON-STATIONARY" else "STATIONARY"))
-  cat("=================================================================\n")
+  if (verbose) {
+    message("-----------------------------------------------------------------")
+    message(sprintf("Conclusion: %s null hypothesis of stationarity",
+                if (reject) "Reject" else "Cannot reject"))
+    message(sprintf("            -> Series is %s",
+                if (reject) "NON-STATIONARY" else "STATIONARY"))
+    message("=================================================================")
+  }
   
   result <- list(
     statistic = best_result$kpss_stat,
@@ -594,30 +612,28 @@ print.fkpss <- function(x, ...) {
 #' @param y Time series
 #' @param name Optional name for the series
 #' @param max_freq Maximum Fourier frequency
+#' @param verbose Logical. Print progress messages (default: TRUE)
 #'
 #' @return List with results from both tests and joint conclusion
 #'
 #' @export
-fourier_unit_root_analysis <- function(y, name = "Series", max_freq = 3) {
+fourier_unit_root_analysis <- function(y, name = "Series", max_freq = 3, verbose = TRUE) {
   
-  cat("\n")
-  cat("###############################################################\n")
-  cat(sprintf("   Unit Root Analysis: %s\n", name))
-  cat("###############################################################\n\n")
+  if (verbose) {
+    message("")
+    message("###############################################################")
+    message(sprintf("   Unit Root Analysis: %s", name))
+    message("###############################################################\n")
+  }
   
   # Fourier ADF
-  cat(">>> Fourier ADF Test <<<\n\n")
-  adf_result <- fourier_adf_test(y, model = "c", max_freq = max_freq)
+  if (verbose) message(">>> Fourier ADF Test <<<\n")
+  adf_result <- fourier_adf_test(y, model = "c", max_freq = max_freq, verbose = verbose)
   
-  cat("\n>>> Fourier KPSS Test <<<\n\n")
-  kpss_result <- fourier_kpss_test(y, model = "c", max_freq = max_freq)
+  if (verbose) message("\n>>> Fourier KPSS Test <<<\n")
+  kpss_result <- fourier_kpss_test(y, model = "c", max_freq = max_freq, verbose = verbose)
   
   # Joint interpretation
-  cat("\n")
-  cat("===============================================================\n")
-  cat("   JOINT CONCLUSION\n")
-  cat("===============================================================\n")
-  
   if (adf_result$reject_null && !kpss_result$reject_null) {
     conclusion <- "STATIONARY (I(0)) - Both tests agree"
     integration_order <- 0
@@ -632,15 +648,20 @@ fourier_unit_root_analysis <- function(y, name = "Series", max_freq = 3) {
     integration_order <- NA
   }
   
-  cat(sprintf("\n%s\n\n", conclusion))
-  
-  if (adf_result$f_test$reject || kpss_result$optimal_frequency > 1) {
-    cat("Note: Fourier terms ARE significant -> Structural breaks present\n")
-  } else {
-    cat("Note: Fourier terms not significant -> Standard tests may suffice\n")
+  if (verbose) {
+    message("")
+    message("===============================================================")
+    message("   JOINT CONCLUSION")
+    message("===============================================================")
+    message(sprintf("\n%s\n", conclusion))
+    
+    if (adf_result$f_test$reject || kpss_result$optimal_frequency > 1) {
+      message("Note: Fourier terms ARE significant -> Structural breaks present")
+    } else {
+      message("Note: Fourier terms not significant -> Standard tests may suffice")
+    }
+    message("===============================================================")
   }
-  
-  cat("===============================================================\n")
   
   return(list(
     adf = adf_result,

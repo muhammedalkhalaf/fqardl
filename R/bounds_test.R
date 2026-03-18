@@ -1,4 +1,4 @@
-﻿#' =============================================================================
+#' =============================================================================
 #' Bounds Test for Cointegration
 #' Based on Pesaran, Shin & Smith (2001)
 #' With extensions for Quantile ARDL
@@ -187,11 +187,13 @@ get_pss_critical_values <- function(k, case = 3) {
 #' @param tau Quantiles
 #' @param case Model case
 #' @param n_boot Number of bootstrap replications
+#' @param verbose Logical. Print progress messages (default: FALSE)
 #'
 #' @return List with bootstrap p-values
 #'
 #' @export
-bootstrap_bounds_test <- function(y, X, fourier, p, q, tau, case, n_boot = 1000) {
+bootstrap_bounds_test <- function(y, X, fourier, p, q, tau, case, n_boot = 1000,
+                                  verbose = FALSE) {
   
   n <- length(y)
   k <- ncol(X)
@@ -226,7 +228,7 @@ bootstrap_bounds_test <- function(y, X, fourier, p, q, tau, case, n_boot = 1000)
       boot_F[b] <- NA
     })
     
-    if (b %% 100 == 0) cat(sprintf("   Bootstrap replication %d/%d\n", b, n_boot))
+    if (verbose && b %% 100 == 0) message(sprintf("   Bootstrap replication %d/%d", b, n_boot))
   }
   
   # Remove NAs
