@@ -1,0 +1,4 @@
+^roudane-r-ports$
+^\.git$
+^cran-comments\.md$
+^verify_.*\.R$
