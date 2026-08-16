@@ -1,4 +1,6 @@
 ^roudane-r-ports$
 ^\.git$
 ^cran-comments\.md$
+^ADVERSARIAL\.R$
+^adversarial-report\.txt$
 ^verify_.*\.R$

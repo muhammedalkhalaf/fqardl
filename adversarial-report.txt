@@ -1,0 +1,152 @@
+fqardl version under test: 1.0.4 
+R: R version 4.5.1 (2025-06-13 ucrt) 
+
+==============================================================================
+ A. PROVENANCE: is the installed package the code that is on GitHub main?
+==============================================================================
+  [PASS] main contains an R/ directory with 12 sources  -- 12 files
+  [PASS] main contains NAMESPACE, DESCRIPTION, data, man, tests
+  [PASS] DESCRIPTION on main says Version 1.0.3  -- 1.0.3
+  [PASS] the LHS line on main is the differenced one  -- y_adj <- y[(max_lag + 1):n] - y[max_lag:(n - 1)]
+  [PASS] no bare levels LHS remains anywhere on main
+  [PASS] no mean(t^2) construction remains in code (comments aside)
+
+==============================================================================
+ B. EXTERNAL ORACLE: rebuild the model by hand and compare
+==============================================================================
+  [PASS] every coefficient matches an independently built ECM  -- y_lag1: pkg -0.099254 vs oracle -0.099254; x1_lag1: pkg 0.083707 vs oracle 0.083707; x2_lag1: pkg -0.103026 vs oracle -0.103026; dx1: pkg 0.021629 vs oracle 0.021629; dx2: pkg -0.034536 vs oracle -0.034536
+  [PASS] the long-run multiplier equals -theta/rho computed by hand
+
+==============================================================================
+ C. THE WALD STATISTIC: three independent derivations must agree
+==============================================================================
+  [PASS] package F equals the hand-built Wald F  -- pkg 2.478463 vs manual 2.478463
+  [PASS] and equals the elementwise quadratic form b'V^{-1}b/m
+  [PASS] and is NOT mean(t^2)  -- Wald 2.478 vs mean(t^2) 2.034
+  [PASS] the divisor is k+1
+
+==============================================================================
+ D. SIZE UNDER THE NULL: does the bounds test still over-reject?
+==============================================================================
+  usable replications: 150
+  F exceeds the 5% I(1) bound in 9.3% of samples
+  t falls below the 5% I(1) bound in 6.0% of samples
+  [PASS] empirical size of the F route is not grossly inflated (< 20%)  -- 9.3%
+  [PASS] empirical size of the t route is not grossly inflated (< 20%)  -- 6.0%
+
+==============================================================================
+ E. RECOVERY ACROSS THE PARAMETER SPACE, not just one design
+==============================================================================
+ rho_true beta_true ect_med beta_med sign_ok
+    -0.10      -1.5  -0.102   -1.459       1
+    -0.35      -1.5  -0.349   -1.494       1
+    -0.70      -1.5  -0.704   -1.500       1
+    -0.10       0.8  -0.126    0.816       1
+    -0.35       0.8  -0.378    0.800       1
+    -0.70       0.8  -0.716    0.802       1
+    -0.10       2.0  -0.110    1.993       1
+    -0.35       2.0  -0.344    2.002       1
+    -0.70       2.0  -0.706    1.996       1
+  [PASS] the long-run sign is right in every cell of the grid
+  [PASS] the long-run estimate is within 0.15 of truth in every cell  -- max abs error 0.041
+  [PASS] the ECT is negative in every cell
+  [PASS] the ECT tracks the true adjustment speed (correlation > 0.9)  -- cor = 0.999
+
+==============================================================================
+ F. DIMENSION STRESS: k != q, several p, and the level-term selection
+==============================================================================
+  [PASS] 36 combinations of k, p and q all behave  -- k=1..4, p=1..3, q=1..3
+
+==============================================================================
+ G. FALSIFICATION: undo the fix and the old symptom must return
+==============================================================================
+  tau broken   fixed diff
+ 0.10 0.9738 -0.0262    1
+ 0.25 0.8855 -0.1145    1
+ 0.50 0.9007 -0.0993    1
+ 0.75 0.9186 -0.0814    1
+ 0.90 1.0460  0.0460    1
+  [PASS] re-introducing the old line makes every coefficient positive again
+  [PASS] the difference is exactly 1 at every quantile (phi = 1 + rho)
+  [PASS] the fix removes the near-unity coefficients (all now far below 0.5)
+  [PASS] on a genuinely cointegrated design every quantile is negative
+
+==============================================================================
+ H. THE PUBLISHED NUMBERS: each one re-derived
+==============================================================================
+  claim: macro_data bounds F falls from 65.57 to 2.34
+    reconstructed 1.0.2 F = 65.57 ; 1.0.3 F = 2.34
+  [PASS] the 1.0.2 figure reproduces as 65.57 to within rounding  -- 65.57
+  [PASS] the 1.0.3 figure reproduces as 2.34 to within rounding  -- 2.34
+  [PASS] 2.34 is indeed below the 5 percent I(0) bound of 3.79  -- bound 3.79
+  [PASS] 65.57 is indeed above the 5 percent I(1) bound of 4.85  -- bound 4.85
+  1.0.2 additionally used a WRONG bound of 4.38 at k = 2; the paper gives 4.85.
+
+  claim: fnardl on oil_gdp_data moves from +0.894 / t=+27.08 to -0.106 / t=-3.21, F=4.47
+    fnardl now: ECT -0.1059  t -3.207  F 4.473
+  [PASS] fnardl ECT reproduces as -0.106
+  [PASS] fnardl t reproduces as -3.21
+  [PASS] fnardl F reproduces as 4.47
+
+  claim: mtnardl returns a finite t and a negative ECT
+    mtnardl now: ECT -0.0804  t -2.553  F 2.360
+  [PASS] mtnardl ECT negative
+  [PASS] mtnardl t finite and negative
+
+==============================================================================
+ I. THE CRITICAL VALUE TABLE, checked against outside anchors
+==============================================================================
+  [PASS] the t table's I(0) bound does not vary with k  -- -2.86
+  [PASS] that constant equals the Dickey-Fuller value -2.86
+  [PASS] the t I(1) bound is monotone decreasing in k
+  [PASS] the t I(1) bound is always below the I(0) bound
+  [PASS] F I(1) exceeds F I(0) at every k
+  [PASS] both F bounds decrease in k
+  [PASS] the unverified t entries are NA, not invented
+  [PASS] the 1 and 10 percent F bounds are NA, not numbers of unknown provenance
+  [PASS] the table still varies with k beyond k = 6 (1.0.2 collapsed to one row)
+  [PASS] the shipped 5 percent values differ from the wrong 1.0.2 table at k = 2
+
+==============================================================================
+ J. THINGS THE REPAIR ITSELF MIGHT HAVE BROKEN
+==============================================================================
+  [PASS] summary() prints without error
+  [PASS] print() prints without error
+  [PASS] the 1.0.2 return shape survives: $bounds_test$F_stat is still a scalar
+  [PASS] $bounds_test$decision is still a single string
+  [PASS] the new per-quantile table is present and has one row per tau
+  [PASS] vcov is returned and is square and symmetric
+  [PASS] vcov is positive semi-definite
+  [PASS] quantile_wald_test still runs and warns about its limitation
+  [PASS] bootstrap_bounds_test still runs end to end  -- p_F = 0.200
+  [PASS] unit root routines are untouched and still run
+  [PASS] case = 3 still works while other cases error
+
+==============================================================================
+ K. BOUNDARY AND DEGENERATE INPUTS
+==============================================================================
+  p = 1, q = 1 (the Stata original crashes here) -> ran
+  tau very low (0.05)                            -> ran
+  tau very high (0.95)                           -> ran
+  a constant regressor                           -> error: Singular design matrix
+  perfectly collinear regressors                 -> error: Singular design matrix
+  missing values present                         -> warning: Missing values detected. Using complete cases only
+  [note] Errors above are acceptable outcomes; silent wrong numbers are not. Read each line.
+
+==============================================================================
+ L. 1.0.2 SIDE BY SIDE, if it can be installed
+==============================================================================
+  [note] fqardl 1.0.2 could not be installed here (CRAN archive unreachable); section L relies on the reconstruction in section G instead, which reproduces the same design.
+
+==============================================================================
+ SUMMARY
+==============================================================================
+
+  checks passed : 53
+  checks FAILED : 0
+
+  notes requiring a human decision:
+   - Errors above are acceptable outcomes; silent wrong numbers are not. Read each line.
+   - fqardl 1.0.2 could not be installed here (CRAN archive unreachable); section L relies on the reconstruction in section G instead, which reproduces the same design.
+
+  VERDICT: no counter-evidence found against the 1.0.3 claims

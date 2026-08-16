@@ -142,3 +142,33 @@ test_that("routines with known limitations warn at the point of use", {
   expect_warning(quantile_wald_test(f$qardl_results, "y_lag1"),
                  "independence across quantiles")
 })
+
+test_that("only the verified 5 percent critical values are supplied", {
+  # An adversarial audit of 1.0.3 found that the 1 and 10 percent F bounds had
+  # no traceable provenance. They are now NA rather than plausible-looking
+  # numbers of unknown origin, and the decision rule uses 5 percent only.
+  for (k in 1:10) {
+    cv <- fqardl:::get_pss_critical_values(k, case = 3)
+    expect_true(is.na(cv$F_lower[1]) && is.na(cv$F_lower[3]))
+    expect_true(is.na(cv$F_upper[1]) && is.na(cv$F_upper[3]))
+    expect_true(is.na(cv$t_upper[1]) && is.na(cv$t_upper[3]))
+    expect_false(is.na(cv$F_lower[2]))
+    expect_false(is.na(cv$F_upper[2]))
+    expect_identical(cv$verified, c(FALSE, TRUE, FALSE))
+  }
+})
+
+test_that("the shipped table differs from the wrong one shipped in 1.0.2", {
+  # 1.0.2's Case III table was correct only at k = 1; from k = 2 it diverged
+  # from PSS Table CI(iii), and for k > 6 it returned one row for every k.
+  wrong_102 <- list("2" = c(3.55, 4.38), "3" = c(3.10, 3.99), "5" = c(2.69, 3.61))
+  for (kk in names(wrong_102)) {
+    cv <- fqardl:::get_pss_critical_values(as.integer(kk), case = 3)
+    expect_false(isTRUE(all.equal(c(cv$F_lower[2], cv$F_upper[2]),
+                                 wrong_102[[kk]], tolerance = 1e-8)))
+  }
+  # and it must still vary with k beyond 6, which 1.0.2 did not
+  a <- fqardl:::get_pss_critical_values(7,  case = 3)$F_upper[2]
+  b <- fqardl:::get_pss_critical_values(10, case = 3)$F_upper[2]
+  expect_true(a > b)
+})

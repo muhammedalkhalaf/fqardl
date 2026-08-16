@@ -12,13 +12,13 @@ test_that("get_pss_critical_values returns correct structure", {
   expect_equal(length(cv$F_lower), 3)
   expect_equal(length(cv$F_upper), 3)
   expect_equal(length(cv$t_upper), 3)
-  
-  # Upper should be > lower
-  expect_true(all(cv$F_upper > cv$F_lower))
-  
-  # Critical values should be positive for F
-  expect_true(all(cv$F_lower > 0))
-  expect_true(all(cv$F_upper > 0))
+
+  # CHANGED in 1.0.4: only the verified 5 percent column is supplied; the 1 and
+  # 10 percent points are NA rather than numbers of unknown provenance.
+  expect_true(cv$F_upper[2] > cv$F_lower[2])
+  expect_true(cv$F_lower[2] > 0)
+  expect_true(cv$F_upper[2] > 0)
+  expect_true(all(is.na(c(cv$F_lower[c(1,3)], cv$F_upper[c(1,3)]))))
   
   # t critical values should be negative.
   # CHANGED in 1.0.3: only the 5 percent I(1) bound has been verified against
@@ -36,6 +36,7 @@ test_that("critical values vary with k", {
   
   # Critical values should generally decrease with k
   expect_true(cv_k1$F_lower[2] > cv_k3$F_lower[2])
+  expect_true(cv_k1$F_upper[2] > cv_k3$F_upper[2])
 })
 
 test_that("cases other than 3 are refused rather than silently mis-served", {

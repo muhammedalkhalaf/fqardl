@@ -198,31 +198,23 @@ get_pss_critical_values <- function(k, case = 3) {
 
   kk <- max(1L, min(10L, as.integer(k)))
 
-  # Table CI(iii): 1%, 5%, 10%; I(0) then I(1). Rows k = 1 .. 10.
-  # The 5 percent column has been checked against the printed table for every
-  # k from 1 to 10. The 1 and 10 percent columns are inherited from 1.0.2 and
-  # are consistent with the widely reproduced table, but have not been
-  # independently verified against the original. Scheduled for 2.0.0.
-  F_low <- c(6.84, 4.94, 4.04,
-             5.15, 3.79, 3.17,
-             4.29, 3.23, 2.72,
-             3.74, 2.86, 2.45,
-             3.41, 2.62, 2.26,
-             3.15, 2.45, 2.12,
-             2.96, 2.32, 2.03,
-             2.79, 2.22, 1.95,
-             2.65, 2.14, 1.88,
-             2.54, 2.06, 1.83)
-  F_upp <- c(7.84, 5.73, 4.78,
-             6.36, 4.85, 4.14,
-             5.61, 4.35, 3.77,
-             5.06, 4.01, 3.52,
-             4.68, 3.79, 3.35,
-             4.43, 3.61, 3.23,
-             4.26, 3.50, 3.13,
-             4.10, 3.39, 3.06,
-             3.97, 3.30, 2.99,
-             3.86, 3.24, 2.94)
+  # Table CI(iii), 5 percent points only, I(0) lower then I(1) upper, k = 1..10.
+  # Verified line by line against the printed table and checked by a test.
+  #
+  # The 1 and 10 percent points are deliberately NOT supplied. An adversarial
+  # audit of 1.0.3 found that the entries carried there had no traceable
+  # provenance: they were neither the values shipped in 1.0.2 nor anything I
+  # could tie to the paper. Shipping plausible-looking numbers of unknown origin
+  # is precisely the fault this release exists to correct, so they are returned
+  # as NA. The decision rule uses the 5 percent level only.
+  #
+  # For the record, 1.0.2's own Case III table was wrong for every k >= 2 and
+  # collapsed to a single row for k > 6. At k = 2 it used an I(1) bound of 4.38
+  # where the paper gives 4.85, which made rejection easier for a second reason
+  # independent of the levels-versus-differences defect.
+  F5_low <- c(4.94, 3.79, 3.23, 2.86, 2.62, 2.45, 2.32, 2.22, 2.14, 2.06)
+  F5_upp <- c(5.73, 4.85, 4.35, 4.01, 3.79, 3.61, 3.50, 3.39, 3.30, 3.24)
+
   # Table CII(iii): the I(0) bound is constant in k.
   # VERIFIED against the paper: the 5 percent I(1) upper bounds, k = 0..10, are
   #   -2.86 -3.22 -3.53 -3.78 -3.99 -4.19 -4.38 -4.57 -4.72 -4.88 -5.03
@@ -236,14 +228,13 @@ get_pss_critical_values <- function(k, case = 3) {
               -4.38, -4.57, -4.72, -4.88, -5.03)   # k = 1..10
   t_upp <- rbind(rep(NA_real_, 10), t_upp5, rep(NA_real_, 10))
 
-  idx <- ((kk - 1L) * 3L + 1L):(kk * 3L)
-
   list(
-    F_lower      = unname(F_low[idx]),
-    F_upper      = unname(F_upp[idx]),
+    F_lower      = c(NA_real_, F5_low[kk], NA_real_),
+    F_upper      = c(NA_real_, F5_upp[kk], NA_real_),
     t_lower      = unname(t_low),
     t_upper      = unname(t_upp[, kk]),
-    significance = c("1%", "5%", "10%")
+    significance = c("1%", "5%", "10%"),
+    verified     = c(FALSE, TRUE, FALSE)
   )
 }
 
