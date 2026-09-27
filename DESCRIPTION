@@ -23,8 +23,8 @@ Description: Comprehensive implementation of advanced ARDL methodologies for
     <doi:10.1007/978-1-4899-8008-3_9>; (3) Multi-Threshold NARDL (MTNARDL) - 
     multiple regime asymmetry analysis; (4) Fourier Unit Root Tests - ADF and 
     KPSS tests with Fourier terms following Enders & Lee (2012) 
-    <doi:10.1016/j.econlet.2012.05.019> and Becker, Enders & Lee (2006) 
-    <doi:10.1111/j.1467-9892.2006.00490.x>. Features automatic lag and frequency 
+    <doi:10.1016/j.econlet.2012.04.081> and Becker, Enders & Lee (2006) 
+    <doi:10.1111/j.1467-9892.2006.00478.x>. Features automatic lag and frequency 
     selection, PSS bounds testing following Pesaran, Shin & Smith (2001) 
     <doi:10.1002/jae.616>, bootstrap cointegration tests, Wald tests for 
     asymmetry, dynamic multiplier computation, and publication-ready 
