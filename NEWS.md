@@ -259,5 +259,4 @@ This release ships `verify_fqardl_103.R`, sixteen checks, all passing, including
 
 ### Acknowledgments
 
-* Dr. Merwan Roudane for the original Stata implementation
 * Rufyq Elngeh (رفيق النجاح) for supporting this development

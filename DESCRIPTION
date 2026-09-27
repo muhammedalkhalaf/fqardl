@@ -9,11 +9,7 @@ Authors@R: c(
     person("Muhammad", "Alkhalaf", 
            email = "muhammedalkhalaf@gmail.com", 
            role = c("aut", "cre", "cph"),
-           comment = c(ORCID = "0009-0002-2677-9246")),
-    person("Merwan", "Roudane", 
-           email = "merwanroudane920@gmail.com", 
-           role = c("ctb"),
-           comment = "Original Stata/Python implementation"))
+           comment = c(ORCID = "0009-0002-2677-9246")))
 Description: Comprehensive implementation of advanced ARDL methodologies for 
     cointegration analysis with structural breaks and asymmetric effects.
     Includes: (1) Fourier Quantile ARDL (FQARDL) - quantile regression with 
@@ -28,7 +24,7 @@ Description: Comprehensive implementation of advanced ARDL methodologies for
     selection, PSS bounds testing following Pesaran, Shin & Smith (2001) 
     <doi:10.1002/jae.616>, bootstrap cointegration tests, Wald tests for 
     asymmetry, dynamic multiplier computation, and publication-ready 
-    visualizations. Ported from Stata/Python by Dr. Merwan Roudane.
+    visualizations.
 License: GPL-3
 URL: https://github.com/muhammedalkhalaf/fqardl
 BugReports: https://github.com/muhammedalkhalaf/fqardl/issues
