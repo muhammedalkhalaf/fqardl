@@ -1,3 +1,10 @@
+# fqardl 1.0.5
+
+* Corrected the DOIs of Enders and Lee (2012) (10.1016/j.econlet.2012.04.081) and Becker, Enders and Lee (2006) (10.1111/j.1467-9892.2006.00478.x) in DESCRIPTION.
+* Six Rd files had their \title polluted by file-header banners written as roxygen comments; the banners are now plain comments and the titles are restored.
+* Removed a start-up message crediting a third party; Authors@R and README updated.
+* No changes to estimation code.
+
 # fqardl 1.0.4
 
 An adversarial audit of 1.0.3 was run before submitting it to CRAN: fifty-three
