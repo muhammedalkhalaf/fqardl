@@ -3,3 +3,4 @@
 ^ADVERSARIAL\.R$
 ^adversarial-report\.txt$
 ^verify_.*\.R$
+^\.zenodo\.json$
