@@ -2,8 +2,8 @@ Package: fqardl
 Type: Package
 Title: Fourier ARDL Methods: Quantile, Nonlinear, Multi-Threshold &
         Unit Root Tests
-Version: 1.1.0
-Date: 2026-10-03
+Version: 1.1.1
+Date: 2026-11-07
 Maintainer: Muhammad Alkhalaf <muhammedalkhalaf@gmail.com>
 Authors@R: c(
     person("Muhammad", "Alkhalaf", 
