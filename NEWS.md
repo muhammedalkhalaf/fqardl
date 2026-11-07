@@ -6,7 +6,7 @@
 * `plot_dynamic_multipliers()`, `plot_cumulative_multipliers()` and `plot(<fnardl>, type = "dynamic" | "cumulative")` plot the multipliers of `dynamic_multipliers()`. Up to 1.1.0 they plotted `SR + (LR - SR) * (1 - (1 + rho)^h)` and its cumulative sum, and gave NA values.
 * `compute_asymmetric_multipliers()`: `long_run_positive`, `long_run_negative`, `short_run_positive` and `short_run_negative` are named by the decomposed variable (`"x"`), not `"x.x_pos_lag1"`; `ect` is unnamed. `plot(<fnardl>, type = "asymmetry" | "comparison")` use these names.
 * `summary()` of `fnardl` objects prints the short-run symmetry tests.
-* Man pages and tests updated (tests/testthat/test-nardl-paper-1.1.1.R).
+* Man pages and tests updated (tests/testthat/test-nardl-paper-1.1.1.R). The test that two bootstrap runs with the same seed give the same statistics compares them with a tolerance of 1e-10 instead of exact equality.
 
 # fqardl 1.1.0
 

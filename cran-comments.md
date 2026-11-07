@@ -9,7 +9,7 @@ CRAN version: 1.1.0.
 * plot_dynamic_multipliers(), plot_cumulative_multipliers(): plot the multipliers of dynamic_multipliers().
 * compute_asymmetric_multipliers(): elements named by the decomposed variable.
 * summary() of fnardl objects prints the short-run symmetry tests.
-* Man pages and tests updated.
+* Man pages and tests updated. tests/testthat/test-bootstrap-1.1.0.R: the comparison of two bootstrap runs with the same seed is made with expect_equal(tolerance = 1e-10), not expect_identical().
 
 ### Test environments
 
